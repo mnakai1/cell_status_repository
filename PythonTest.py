@@ -27,9 +27,8 @@ def readfile(celltype, flasknumber):						#Reads ReadHere.txt, searches for cell
 				chunkdata = element.split('|')				#Now chunkdata has ['date', 'ifchecked', 'ifsplit', 'splitfraction', 'cellcount', 'comments']
 				print(chunkdata[0] + '\t' + chunkdata[1] + '\t\t' + chunkdata[2] + '\t' + chunkdata[3] + '\t\t' + chunkdata[4] + '\t\t' + chunkdata[5])
 			print('\n')
-		else:
-			print('We couldn\'t find the cell line or flask number you\'re inputting \n')
 			break
+
 	f.close()												#close ReadHere.txt
 	
 
@@ -44,14 +43,24 @@ def writeinfo(celltype, flasknumber, date, ifchecked, ifsplit, splitfraction, ce
 	#All local variables go here
 	line = ''
 	newline = ''
+	stringything = ''
+	i = 0
 	
 	x = shell.SHGetFolderPath(0, shellcon.CSIDL_DESKTOP, None, 0)
-	f = open(x + '\\Cell_Checker\\ReadHere.txt', 'r')	#open ReadHere.txt for reading and writing
+	f = open(x + '\\Cell_Checker\\ReadHere.txt', 'r')			#open ReadHere.txt for reading and writing
 	newinfo = date + '|' + ifchecked + '|' + ifsplit + '|' + splitfraction + '|' + cellcount + '|' + comments #This isn't a capital I, it's a seperator | (Shift+\)
 	for line in f:
-		splitline = line.split(',')							#Seperating the list into chunks deliniated by commas. splitline[0] = cell+flasknumber, while splitline[1:] = 'date ifchecked ifsplit splitfraction cellcount comments'
-		if splitline[0] == celltype + ' ' + flasknumber:	#Checks to see if current line has the correct celltype+flasknumber
-			newline = line + ',' + newinfo					#newline currently equals the line and the newinfo, now we'll open the file, copy/paste the entire file, and search/replace the line with newline
+		print('Line: ', line)
+		splitline = line.split(',')								#Seperating the list into chunks deliniated by commas. splitline[0] = cell+flasknumber, while splitline[1:] = 'date ifchecked ifsplit splitfraction cellcount comments'
+		sanitizedsplitline = splitline[0].replace('\n', '')
+		combonumber = celltype + ' ' + flasknumber
+		if sanitizedsplitline == combonumber:					#Checks to see if current line has the correct celltype+flasknumber
+			print('Sansplit: ', sanitizedsplitline)
+			print('combonumber: ', combonumber)
+			print('Pinged')
+			newline = line.replace('\n', '') + ',' + newinfo	#newline currently equals the line and the newinfo, now we'll open the file, copy/paste the entire file, and search/replace the line with newline
+			newline = newline + '\n'
+			break
 	f.close()
 	
 	file = open(x + '\\Cell_Checker\\ReadHere.txt', 'r')
@@ -59,6 +68,10 @@ def writeinfo(celltype, flasknumber, date, ifchecked, ifsplit, splitfraction, ce
 	file.close()
 	
 	newfiledata = filedata.replace(line, newline)
+	print('Line:', line)
+	print('Newline', newline)
+	print(filedata)
+	print(newfiledata)
 	f = open(x + '\\Cell_Checker\\ReadHere.txt', 'w')
 	f.write(newfiledata)
 	f.close()
@@ -122,10 +135,12 @@ def check_if_files_exist_and_do_something_about_it():	#Pretty much as it says
 	i = 1
 	x = shell.SHGetFolderPath(0, shellcon.CSIDL_DESKTOP, None, 0)
 	
-	#Seeing if there's a file called ReadHere.txt, then making one and putting some info in it if it doesn't exist.
-	if ReadHerepath == '':
-		file = open(x + '\\Cell_Checker\\ReadHere.txt', 'w')
+	file = open(x + '\\Cell_Checker\\ReadHere.txt', 'r')
+	content = file.read()
+	file.close()
+	if content == '':
 		print('No data file was found. We\'ll make a new one, so please supply the cell details below. \n')
+		file = open(x + '\\Cell_Checker\\ReadHere.txt', 'w')
 		while celllinesexhausted == False:
 			userinput1 = input('Enter the name of your first cell line: ')
 			userinput2 = input('Enter how many flasks you have of that cell line: ')
@@ -139,11 +154,8 @@ def check_if_files_exist_and_do_something_about_it():	#Pretty much as it says
 		FlagReadThis = False
 		file.close()
 
-	#Same thing for operationlog.txt, but no info's added yet.
-	if operationlogpath == '':
+	if not os.path.exists(x + '\\Cell_Checker\\operationlog.txt'):
 		file = open(x + '\\Cell_Checker\\operationlog.txt', 'w')
-		file.close()
-	FlagOperationLog = False
 		
 		
 def find_file_paths():
@@ -161,12 +173,14 @@ def find_file_paths():
 				global ReadHerepath
 				ReadHerepath = ReadHerelist[0]
 	print(ReadHerepath + '\n' + operationlogpath)
-	print('Done')
-			
+	print('Done\n-------------------------------------------------\n')
+
 
 #Main function
 
 if __name__ == '__main__':
+	print('Starting up...')
+	find_file_paths()
 	check_if_folders_exits_and_do_something_about_it()
 	check_if_files_exist_and_do_something_about_it()
 	while exitflag == False:
