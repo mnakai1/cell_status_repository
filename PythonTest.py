@@ -107,6 +107,12 @@ def ask_for_exit():		#Asks user if he/she wants to exit. If yes, then the exitfl
 		exitflag = False
 		print('\n-------------------------------------------------\n')
 	
+
+def check_if_folders_exits_and_do_something_about_it():	#who wrote this shit code? Oh wait, it's me. It makes a folder called Cell_Checker if it doesn't exist on the Desktop
+	x = shell.SHGetFolderPath(0, shellcon.CSIDL_DESKTOP, None, 0)
+	if not os.path.exists(x):
+		os.makedirs('Cell_Checker')
+	
 	
 def check_if_files_exist_and_do_something_about_it():	#pretty much as it says
 	FlagReadThis = True
@@ -114,7 +120,7 @@ def check_if_files_exist_and_do_something_about_it():	#pretty much as it says
 	FlagOperationLog = True
 	i = 1
 	
-	while FlagReadThis == True:
+	while FlagReadThis == True:	#Seeing if there's a file called ReadHere.txt, then making one and putting some info in it if it doesn't exist.
 		try:
 			f = open(r'\\ad.monash.edu\home\User062\mnak0010\Desktop\Script_Stuff\Python\Cell_Check\ReadHere.txt', 'r')
 			f.close()
@@ -136,7 +142,7 @@ def check_if_files_exist_and_do_something_about_it():	#pretty much as it says
 			FlagReadThis = False
 			file.close()
 
-	while FlagOperationLog == True:
+	while FlagOperationLog == True:	#Same thing for operationlog.txt, but no info's added yet.
 		try:
 			file = open(r'\\ad.monash.edu\home\User062\mnak0010\Desktop\Script_Stuff\Python\Cell_Check\operationlog.txt', 'r')
 			file.close()
@@ -145,16 +151,21 @@ def check_if_files_exist_and_do_something_about_it():	#pretty much as it says
 			file.close()
 		FlagOperationLog = False
 		
+		
 def find_file_paths():
 	x = shell.SHGetFolderPath(0, shellcon.CSIDL_DESKTOP, None, 0)
+	logpathlist = []
+	ReadHerelist = []
 	for root, dirs, files in os.walk(x):
 		for name in files:
 			if name == 'operationlog.txt':
+				logpathlist.append(os.path.abspath(os.path.join(root, name)))
 				global operationlogpath
-				operationlogpath = os.path.abspath(os.path.join(root, name))
+				operationlogpath = logpathlist[0]
 			elif name == 'ReadHere.txt':
+				ReadHerelist.append(os.path.abspath(os.path.join(root, name)))
 				global ReadHerepath
-				ReadHerepath = os.path.abspath(os.path.join(root, name))
+				ReadHerepath = ReadHerelist[0]
 	print(ReadHerepath + '\n' + operationlogpath)
 	print('Done')
 			
@@ -162,6 +173,7 @@ def find_file_paths():
 #Main function
 
 if __name__ == '__main__':
+	check_if_folders_exits_and_do_something_about_it()
 	check_if_files_exist_and_do_something_about_it()
 	while exitflag == False:
 		mainchoiceprompt = input('Add new data (a), read data (r), or show filepaths (f): ')
