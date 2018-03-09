@@ -1,5 +1,6 @@
 #Import everything here
 import datetime, os
+from win32com.shell import shell, shellcon
 
 
 #Global variables
@@ -145,7 +146,8 @@ def check_if_files_exist_and_do_something_about_it():	#pretty much as it says
 		FlagOperationLog = False
 		
 def find_file_paths():
-	for root, dirs, files in os.walk(r'C:\\'):
+	x = shell.SHGetFolderPath(0, shellcon.CSIDL_DESKTOP, None, 0)
+	for root, dirs, files in os.walk(x):
 		for name in files:
 			if name == 'operationlog.txt':
 				global operationlogpath
@@ -153,6 +155,8 @@ def find_file_paths():
 			elif name == 'ReadHere.txt':
 				global ReadHerepath
 				ReadHerepath = os.path.abspath(os.path.join(root, name))
+	print(ReadHerepath + '\n' + operationlogpath)
+	print('Done')
 			
 
 #Main function
@@ -160,7 +164,7 @@ def find_file_paths():
 if __name__ == '__main__':
 	check_if_files_exist_and_do_something_about_it()
 	while exitflag == False:
-		mainchoiceprompt = input('Add new data (a) or read data (r): ')
+		mainchoiceprompt = input('Add new data (a), read data (r), or show filepaths (f): ')
 		if mainchoiceprompt == 'a':
 			do_all_the_write()
 			loginput('a', loginfo)
@@ -168,6 +172,9 @@ if __name__ == '__main__':
 		elif mainchoiceprompt == 'r':
 			do_all_the_read()
 			loginput('r', loginfo)
+			ask_for_exit()
+		elif mainchoiceprompt == 'f':
+			find_file_paths()
 			ask_for_exit()
 	if exitflag == True:
 		os._exit(0)
