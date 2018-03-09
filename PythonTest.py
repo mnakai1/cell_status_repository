@@ -6,6 +6,8 @@ import datetime, os
 currentdate = datetime.datetime.now()	#Use to call for times (currentdate.year, currentdate.month, etc.)
 exitflag = False
 loginfo = []
+operationlogpath = ''
+ReadHerepath = ''
 
 
 #Helper functions
@@ -141,6 +143,16 @@ def check_if_files_exist_and_do_something_about_it():	#pretty much as it says
 			file = open(r'\\ad.monash.edu\home\User062\mnak0010\Desktop\Script_Stuff\Python\Cell_Check\operationlog.txt', 'w')
 			file.close()
 		FlagOperationLog = False
+		
+def find_file_paths():
+	for root, dirs, files in os.walk(r'C:\\'):
+		for name in files:
+			if name == 'operationlog.txt':
+				global operationlogpath
+				operationlogpath = os.path.abspath(os.path.join(root, name))
+			elif name == 'ReadHere.txt':
+				global ReadHerepath
+				ReadHerepath = os.path.abspath(os.path.join(root, name))
 			
 
 #Main function
