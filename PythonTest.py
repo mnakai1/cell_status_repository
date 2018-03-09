@@ -44,7 +44,7 @@ def writeinfo(celltype, flasknumber, date, ifchecked, ifsplit, splitfraction, ce
 	line = ''
 	newline = ''
 	
-	f = open(r'\\ad.monash.edu\home\User062\mnak0010\Desktop\Script_Stuff\Python\Cell_Check\ReadHere.txt', 'r')	#open ReadHere.txt for reading and writing
+	f = open(x + '\\Cell_Checker\\ReadHere.txt', 'r')	#open ReadHere.txt for reading and writing
 	newinfo = date + ' ' + ifchecked + ' ' + ifsplit + ' ' + splitfraction + ' ' + cellcount + ' ' + comments
 	for line in f:
 		splitline = line.split(',')							#Seperating the list into chunks deliniated by commas. splitline[0] = cell+flasknumber, while splitline[1:] = 'date ifchecked ifsplit splitfraction cellcount comments'
@@ -52,12 +52,12 @@ def writeinfo(celltype, flasknumber, date, ifchecked, ifsplit, splitfraction, ce
 			newline = line + ',' + newinfo					#newline currently equals the line and the newinfo, now we'll open the file, copy/paste the entire file, and search/replace the line with newline
 	f.close()
 	
-	file = open(r'\\ad.monash.edu\home\User062\mnak0010\Desktop\Script_Stuff\Python\Cell_Check\ReadHere.txt', 'r')
+	file = open(x + '\\Cell_Checker\\ReadHere.txt', 'r')
 	filedata = file.read()
 	file.close()
 	
 	newfiledata = filedata.replace(line, newline)
-	f = open(r'\\ad.monash.edu\home\User062\mnak0010\Desktop\Script_Stuff\Python\Cell_Check\ReadHere.txt', 'w')
+	f = open(x + '\\Cell_Checker\\ReadHere.txt', 'w')
 	f.write(newfiledata)
 	f.close()
 	
@@ -83,16 +83,17 @@ def do_all_the_write():
 	
 
 def loginput(operationtype, infoneeded):	#infoneeded should contain [celltype, flasknumber, date, ifchecked, ifsplit, splitfraction, cellcount, comments], each as a string
+	x = shell.SHGetFolderPath(0, shellcon.CSIDL_DESKTOP, None, 0)
 	if operationtype == 'a':
-		file = open(r'\\ad.monash.edu\home\User062\mnak0010\Desktop\Script_Stuff\Python\Cell_Check\operationlog.txt', 'a')
+		file = open(x + '\\Cell_Checker\\operationlog.txt', 'a')
 		file.write('\n' + str(currentdate) + ' Appended (' + infoneeded[3] + ', ' + infoneeded[4] + ', ' + infoneeded[5] + ', ' + infoneeded[6] + ', ' + infoneeded[7] + ') onto ' + infoneeded[0] + ' flask number ' + infoneeded[1])
 		file.close()
 	elif operationtype == 'r':
-		file = open(r'\\ad.monash.edu\home\User062\mnak0010\Desktop\Script_Stuff\Python\Cell_Check\operationlog.txt', 'a')
+		file = open(x + '\\Cell_Checker\\operationlog.txt', 'a')
 		file.write('\n' + str(currentdate) + ' Read and showed data regarding ' + infoneeded[0] + ' flask number ' + infoneeded[1])
 		file.close()
 	elif operationtype == 'quit':
-		file = open(r'\\ad.monash.edu\home\User062\mnak0010\Desktop\Script_Stuff\Python\Cell_Check\operationlog.txt', 'a')
+		file = open(x + '\\Cell_Checker\\operationlog.txt', 'a')
 		file.write('\n' + str(currentdate) + ' Exited program')
 		file.close
 		
@@ -108,48 +109,39 @@ def ask_for_exit():		#Asks user if he/she wants to exit. If yes, then the exitfl
 		print('\n-------------------------------------------------\n')
 	
 
-def check_if_folders_exits_and_do_something_about_it():	#who wrote this shit code? Oh wait, it's me. It makes a folder called Cell_Checker if it doesn't exist on the Desktop
+def check_if_folders_exits_and_do_something_about_it():	#Who wrote this shit code? Oh wait, it's me. It makes a folder called Cell_Checker if it doesn't exist on the Desktop
 	x = shell.SHGetFolderPath(0, shellcon.CSIDL_DESKTOP, None, 0)
-	if not os.path.exists(x):
-		os.makedirs('Cell_Checker')
+	if not os.path.exists(x + '\\Cell_Checker'):
+		os.makedirs(x + '\\Cell_Checker')
 	
 	
-def check_if_files_exist_and_do_something_about_it():	#pretty much as it says
-	FlagReadThis = True
+def check_if_files_exist_and_do_something_about_it():	#Pretty much as it says
 	celllinesexhausted = False
-	FlagOperationLog = True
 	i = 1
+	x = shell.SHGetFolderPath(0, shellcon.CSIDL_DESKTOP, None, 0)
 	
-	while FlagReadThis == True:	#Seeing if there's a file called ReadHere.txt, then making one and putting some info in it if it doesn't exist.
-		try:
-			f = open(r'\\ad.monash.edu\home\User062\mnak0010\Desktop\Script_Stuff\Python\Cell_Check\ReadHere.txt', 'r')
-			f.close()
-			FlagReadThis = False
-			break
-		except IOError:
-			file = open(r'\\ad.monash.edu\home\User062\mnak0010\Desktop\Script_Stuff\Python\Cell_Check\ReadHere.txt', 'w')
-			print('No data file was found. We\'ll make a new one, so please supply the cell details below. \n')
-			while celllinesexhausted == False:
-				userinput1 = input('Enter the name of your first cell line: ')
-				userinput2 = input('Enter how many flasks you have of that cell line: ')
-				i = 1
-				for _ in range(int(userinput2)):
-					file.write(userinput1 + ' ' + str(i) + '\n')
-					i = i + 1
-				doesuserwannakeepadding = input('Do you have any more cell lines to input? (yes/no): ')
-				if doesuserwannakeepadding == 'no' or doesuserwannakeepadding == 'No' or doesuserwannakeepadding == 'n' or doesuserwannakeepadding == 'NO' or doesuserwannakeepadding == 'N':
-					celllinesexhausted = True
-			FlagReadThis = False
-			file.close()
+	#Seeing if there's a file called ReadHere.txt, then making one and putting some info in it if it doesn't exist.
+	if ReadHerepath == '':
+		file = open(x + '\\Cell_Checker\\ReadHere.txt', 'w')
+		print('No data file was found. We\'ll make a new one, so please supply the cell details below. \n')
+		while celllinesexhausted == False:
+			userinput1 = input('Enter the name of your first cell line: ')
+			userinput2 = input('Enter how many flasks you have of that cell line: ')
+			i = 1
+			for _ in range(int(userinput2)):
+				file.write(userinput1 + ' ' + str(i) + '\n')
+				i = i + 1
+			doesuserwannakeepadding = input('Do you have any more cell lines to input? (yes/no): ')
+			if doesuserwannakeepadding == 'no' or doesuserwannakeepadding == 'No' or doesuserwannakeepadding == 'n' or doesuserwannakeepadding == 'NO' or doesuserwannakeepadding == 'N':
+				celllinesexhausted = True
+		FlagReadThis = False
+		file.close()
 
-	while FlagOperationLog == True:	#Same thing for operationlog.txt, but no info's added yet.
-		try:
-			file = open(r'\\ad.monash.edu\home\User062\mnak0010\Desktop\Script_Stuff\Python\Cell_Check\operationlog.txt', 'r')
-			file.close()
-		except IOError:
-			file = open(r'\\ad.monash.edu\home\User062\mnak0010\Desktop\Script_Stuff\Python\Cell_Check\operationlog.txt', 'w')
-			file.close()
-		FlagOperationLog = False
+	#Same thing for operationlog.txt, but no info's added yet.
+	if operationlogpath == '':
+		file = open(x + '\\Cell_Checker\\operationlog.txt', 'w')
+		file.close()
+	FlagOperationLog = False
 		
 		
 def find_file_paths():
