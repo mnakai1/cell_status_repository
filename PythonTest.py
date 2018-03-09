@@ -12,9 +12,10 @@ ReadHerepath = ''
 
 
 #Helper functions
-def readfile(celltype, flasknumber):	#Reads ReadHere.txt, searches for celltype+flasknumber (both strings), and prints a list of chunkdata per date for a cell type + flask number
-										#Assumes that celltype is a sanitized string (all lowercase)
-	f = open(r'\\ad.monash.edu\home\User062\mnak0010\Desktop\Script_Stuff\Python\Cell_Check\ReadHere.txt', 'r')	#open ReadHere.txt for reading
+def readfile(celltype, flasknumber):						#Reads ReadHere.txt, searches for celltype+flasknumber (both strings), and prints a list of chunkdata per date for a cell type + flask number
+															#Assumes that celltype is a sanitized string (all lowercase)
+	x = shell.SHGetFolderPath(0, shellcon.CSIDL_DESKTOP, None, 0)
+	f = open(x + '\\Cell_Checker\\ReadHere.txt', 'r')		#open ReadHere.txt for reading
 	print('\n')
 	print('Date\t\tChecked?\tSplit?\tSplitfraction\tCell Count\tComments')
 	global loginfo 
@@ -23,7 +24,7 @@ def readfile(celltype, flasknumber):	#Reads ReadHere.txt, searches for celltype+
 		splitline = line.split(',')							#Seperating the list into chunks deliniated by commas. splitline[0] = cell+flasknumber, while splitline[1:] = 'date ifchecked ifsplit splitfraction cellcount comments'
 		if splitline[0] == celltype + ' ' + flasknumber:	#Checks to see if current line has the correct celltype+flasknumber
 			for element in splitline[1:]:					#Remember that element is a str
-				chunkdata = element.split(' ')				#Now chunkdata has ['date', 'ifchecked', 'ifsplit', 'splitfraction', 'cellcount', 'comments']
+				chunkdata = element.split('|')				#Now chunkdata has ['date', 'ifchecked', 'ifsplit', 'splitfraction', 'cellcount', 'comments']
 				print(chunkdata[0] + '\t' + chunkdata[1] + '\t\t' + chunkdata[2] + '\t' + chunkdata[3] + '\t\t' + chunkdata[4] + '\t\t' + chunkdata[5])
 			print('\n')
 		else:
@@ -44,8 +45,9 @@ def writeinfo(celltype, flasknumber, date, ifchecked, ifsplit, splitfraction, ce
 	line = ''
 	newline = ''
 	
+	x = shell.SHGetFolderPath(0, shellcon.CSIDL_DESKTOP, None, 0)
 	f = open(x + '\\Cell_Checker\\ReadHere.txt', 'r')	#open ReadHere.txt for reading and writing
-	newinfo = date + ' ' + ifchecked + ' ' + ifsplit + ' ' + splitfraction + ' ' + cellcount + ' ' + comments
+	newinfo = date + '|' + ifchecked + '|' + ifsplit + '|' + splitfraction + '|' + cellcount + '|' + comments #This isn't a capital I, it's a seperator | (Shift+\)
 	for line in f:
 		splitline = line.split(',')							#Seperating the list into chunks deliniated by commas. splitline[0] = cell+flasknumber, while splitline[1:] = 'date ifchecked ifsplit splitfraction cellcount comments'
 		if splitline[0] == celltype + ' ' + flasknumber:	#Checks to see if current line has the correct celltype+flasknumber
